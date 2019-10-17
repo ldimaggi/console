@@ -77,26 +77,59 @@ export const safeSendKeys = async function(
 };
 
 export const addApplication = async function(name: string, nodeName: string) {
-  // These are not visible when a user first runs the UI on an empty project
-  //  await applicationSelector.click();
-  //  await browser.wait(until.presenceOf(applicationDropdown));
-  //  await createApplication.click();
+// These are not visible when a user first runs the UI on an empty project
+//  await applicationSelector.click();
+//  await browser.wait(until.presenceOf(applicationDropdown));
+//  await createApplication.click();
   await applicationNameField.click();
-  await safeSendKeys(applicationName, 'applicationName', name);
-  await safeSendKeys(appName, 'appName', nodeName);
+  await safeSendKeys (applicationName, "applicationName", name)
+  await safeSendKeys (appName, "appName", nodeName)
 };
 
 export const addApplicationWithExistingApps = async function(name: string, nodeName: string) {
-  await applicationSelector.click();
-  await browser.wait(until.presenceOf(applicationDropdown));
-  await createApplication.click();
-  await applicationNameField.click();
-  await safeSendKeys(applicationName, 'applicationName', name);
-  await safeSendKeys(appName, 'appName', nodeName);
-};
+    await applicationSelector.click();
+    await browser.wait(until.presenceOf(applicationDropdown));
+    await createApplication.click();
+    await applicationNameField.click();
+    await safeSendKeys (applicationName, "applicationName", name)
+    await safeSendKeys (appName, "appName", nodeName)
+  };
 
 export const setBuilderImage = async function(version) {
   await builderImage.click();
   await buildImageVersion.click();
   await version.click();
+};
+
+export const safeSendKeys = async function(element: ElementFinder, elementName: string, newValue: string) {
+  /* Note on the use of the SenKeys Protractor function: There is a widely reported
+     bug in SendKeys where the function randomly drops characters. Most of the
+     workrounds for this bug involve sending individual chacaters one-by-one,
+     separated by calls to browser.sleep() or calls to Browser.executeScript
+     to bypass the Protractor API. In our testing, we found neither of these approaches
+     to be acceptable as we do not want to introduce sleep statements and calls to
+     Browser.executeScript failed to retain values in text fields when buttons are
+     subsequently pressed. We also found that the element.clear() function failed to
+     clear text from text fields and that clearing text fields by sending a control/a
+     sequence encountered the bug where characters are dropped by SendKeys. After
+     experimentation, we found what *seems* to avoid most instances of characters being
+     dropped by adding both "before" and "after" text in SendKeys calls. */
+  await browser.wait(until.elementToBeClickable(element));
+  await element.click();
+  await element.sendKeys("text was", Key.chord(Key.CONTROL, 'a'), newValue);
+
+  element.getAttribute('value').then(async function (insertedValue) {
+    if (insertedValue !== newValue) {
+      console.info ('sendKeys failed for ', elementName, ' - retry', insertedValue, newValue);
+      await element.sendKeys("text was", Key.chord(Key.CONTROL, 'a'), newValue);
+
+      element.getAttribute('value').then(async function (insertedValue) {
+        if (insertedValue !== newValue) {
+          console.info ('sendKeys failed for ', elementName, ' - second retry', insertedValue, newValue);
+          await element.sendKeys("text was", Key.chord(Key.CONTROL, 'a'), newValue);
+        }
+      });
+    }
+  });
+
 };
