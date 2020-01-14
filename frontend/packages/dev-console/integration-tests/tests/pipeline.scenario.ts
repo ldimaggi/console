@@ -45,6 +45,7 @@ describe('Pipeline', async () => {
     await browser.wait(until.visibilityOf(operatorHubView.operatorModal));
     await browser.wait(until.presenceOf(element(by.id('confirm-action'))));
     await element(by.id('confirm-action')).click();
+    await browser.wait(until.presenceOf(operatorHubView.operatorModalInstallBtn));
     await operatorHubView.operatorModalInstallBtn.click();
     await operatorHubView.createSubscriptionFormLoaded();
 
@@ -107,4 +108,6 @@ describe('Pipeline', async () => {
       true,
     );
   });
+
+
 });

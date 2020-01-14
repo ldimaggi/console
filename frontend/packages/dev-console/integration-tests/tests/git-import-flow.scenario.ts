@@ -55,11 +55,13 @@ describe('git import flow', () => {
 
     await setBuilderImage(builderImageVersionName);
     expect(builderImage.isSelected());
-    expect(buildImageVersion.getText()).toContain('8-RHOAR');
+    expect(buildImageVersion.getText()).toContain('8');
     await browser.wait(until.elementToBeClickable(createButton), 5000);
     expect(createButton.isEnabled());
     await createButton.click();
     await browser.wait(until.urlContains('topology/ns/default'));
     expect(browser.getCurrentUrl()).toContain('topology/ns/default');
+
+    await switchPerspective(Perspective.Administrator);
   });
 });
